@@ -112,3 +112,29 @@ result = knn.predict(test_X)
 # display(test_y)
 print(np.sum(result == test_y))
 print(np.sum(result == test_y)/len(result))
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+# 默认情况下matplotlib不支持中文，需要提前进行设置
+
+# 设置字体为黑体，以支持中文显示，其他中文字体也可以
+mpl.rcParams["font.family"] = "SimHei"
+# 设置在中文字体时，能够正常的显示负号
+mpl.rcParams["axes.unicode_minus"] = False
+# ({"versicolor":0,"setosa":1,"virginica":2})
+# 设置画布的大小
+plt.figure(figsize=(10,10))
+# 绘制训练集数据
+plt.scatter(x=t0["Sepal.Length"][:40], y=t0["Petal.Length"][:40],color="r",label="versicolor")
+plt.scatter(x=t1["Sepal.Length"][:40], y=t1["Petal.Length"][:40],color="g",label="setosa")
+plt.scatter(x=t2["Sepal.Length"][:40], y=t2["Petal.Length"][:40],color="b",label="virginica")
+# 绘制测试集数据，分为预测正确的和预测错误的
+right = test_X[result == test_y]
+wrong = test_X[result != test_y]
+plt.scatter(x=right["Sepal.Length"],y=right["Petal.Length"],color="c",marker=">",label="right")
+plt.scatter(x=wrong["Sepal.Length"],y=wrong["Petal.Length"],color="m",marker="x",label="wrong")
+plt.xlabel("花萼长度")
+plt.ylabel("花瓣长度")
+plt.title("KNN分类结果显示")
+plt.legend(loc="best")
+plt.show()
