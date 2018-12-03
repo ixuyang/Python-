@@ -77,6 +77,40 @@ class KNN:
             result.append(np.mean(self.y[index]))
         return np.array(result)
     
+    def predictWithWeight(self,X):
+        """根据参数传递的X，对样本数据进行预测。(考虑权重）
+        权重的计算方式：使用每个节点（邻居）距离的倒数 /所有节点距离倒数之和。
+        
+        Parameters
+        -----
+        X：类数组类型。形状为[样本数量，特征数量]
+        待测试的样本特征（属性）
+        
+        Returns
+        -----
+        result:数组类型。
+        预测的结果值
+        """
+        
+        # 转换成数组类型
+        X = np.asarray(X)
+        # 保存预测的结果值。
+        result = []
+        for x in X:
+            # 计算距离。（计算与训练集中每个X的距离）
+            dis = np.sqrt(np.sum((x - self.X)**2,axis=1))
+            # 返回数组排序后，每个元素在原数组中（排序之前的数组）的索引。
+            index = dis.argsort()
+            # 取前k个距离最近的索引（在原数组中的索引）。
+            index = index[:self.k]
+            # 所有邻居节点距离的倒数之和。[注意最后加上一个很小的值，避免除数（距离，如果重合可能为零）为零的情况]
+            s = np.sum(1 / (dis[index] + 0.001))
+            # 使用每个节点的倒数，然后除以倒数之和，得到权重。
+            weight = (1 / (dis[index] + 0.001)) / s
+            # 使用邻居节点的标签值乘以对应的权重，然后求和，得到最终的预测结果。
+            result.append(np.sum(self.y[index] * weight))
+        return np.array(result)
+    
 t = data.sample(len(data),random_state=0)
 train_X = t.iloc[:120,:-1]
 train_y = t.iloc[:120,-1]
@@ -85,7 +119,29 @@ test_y = t.iloc[120:,-1]
 knn = KNN(k=3)
 knn.fit(train_X,train_y)
 result = knn.predict(test_X)
-print(result)
+print(np.mean(np.sum((result - test_y) ** 2)))
 # 这个地方对误差进行平方处理，避免正负误差抵消。
-np.mean(np.sum((result - test_y) ** 2))
-print(test_y.values)
+np.mean((result - test_y) ** 2)
+# 显示测试结果误差
+print(np.mean((result - test_y) ** 2))
+# print(test_y.values)
+
+result = knn.predictWithWeight(test_X)
+# 显示带有权重后的测试结果误差。
+print(np.mean((result - test_y) ** 2))
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+mpl.rcParams["font.family"] = "SimHei"
+mpl.rcParams["axes.unicode_minus"] = False
+plt.Figure(figsize=(10,10))
+# 绘制预测值
+plt.plot(result,"ro-",label="预测值")
+# 绘制真实值
+plt.plot(test_y.values,"go--",label="真实值")
+plt.title("KNN连续值预测展示")
+plt.xlabel("节点序号")
+plt.ylabel("花瓣宽度")
+plt.legend()
+plt.show()
