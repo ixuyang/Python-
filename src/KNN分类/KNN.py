@@ -5,8 +5,6 @@ Created on 2018年11月29日
 '''
 import numpy as np
 import pandas as pd
-from Tools.scripts.dutree import display
-from numpy.lib.function_base import disp
 
 # 读取鸢尾花数据集，header参数来指定标题的行，默认为0，如果没有标题则使用None。
 data = pd.read_csv(r"iris.csv",header=0)
