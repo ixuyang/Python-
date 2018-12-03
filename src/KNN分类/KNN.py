@@ -89,6 +89,37 @@ class KNN:
             
         return np.asarray(result)
     
+    def predictWithWeight(self,X):
+        """根据参数传递的样本，对样本数据进行预测(考虑权重的，距离越近权重越大，使用距离的倒数来作为权重)
+        
+        Parameters
+        -----
+        X:类数组类型，（通常矩阵类变量要大写），形状为：[样本数量，特征数量]
+待训练的样本特征（属性）
+
+        Returns
+        -----
+        result:数组类型
+预测的结果。
+        """
+        
+        X = np.asarray(X)
+        result = []
+        # 对ndarray数组进行遍历，每次取数据中的一行
+        for x in X:
+            # 改地方的减法会对x进行广播复制，扩展和X行数一样。求差和平方开根号用于计算距离。sum要确定好求和的方式，不是全部，而是一行一行的求和。
+            dis = np.sqrt(np.sum((x - self.X)**2,axis=1))
+            # 返回数组排序后，每个元素在原数组（排序之前的数组）中的索引。
+            index  = dis.argsort()
+            # 进行截断，只取前k个元素。【取距离最近的k个元素的索引】
+            index = index[:self.k]
+            # 返回数组中的每个元素出现的次数，袁术必须是非负的整数。【考虑权重，权重为距离的倒数】
+            count = np.bincount(self.y[index].astype(int),weights=1/dis[index])
+            # 返回ndarray数组中，值最大的元素对应的索引。该索引就是我们判定的类别。
+            # 最大元素索引，就是出现次数最多的元素
+            result.append(count.argmax())
+            
+        return np.asarray(result)
 # 提取出每个类别的鸢尾花数据
 t0 = data[data["Species"] == 0]  
 t1 = data[data["Species"] == 1]   
@@ -108,10 +139,15 @@ knn = KNN(k=3)
 knn.fit(train_X, train_y)
 # 进行测试，获得测试的结果。
 result = knn.predict(test_X)
+# 考虑权重，获取新的测试结果。
+resultWithWeight = knn.predictWithWeight(test_X)
 # display(result)
 # display(test_y)
 print(np.sum(result == test_y))
 print(np.sum(result == test_y)/len(result))
+print("考虑权重的测试结果：")
+print(np.sum(resultWithWeight == test_y))
+print(np.sum(resultWithWeight == test_y)/len(resultWithWeight))
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
