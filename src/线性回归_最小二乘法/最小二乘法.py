@@ -50,12 +50,12 @@ class LinearRegression:
         
         # 说明：如果X是数组对象的一部分，而不是完整的对象数据（例如，X是由其他对象通过切片传递过来），
         # 则无法完成矩阵的转换。
-        # 这里创建X的拷贝对象，避免转换矩阵的时候失败。
+        # 这里创建X的拷贝对象，拷贝后为完整的数组对象，避免转换矩阵的时候失败。
         X = np.asmatrix(X.copy())
         # y是一维结构（行向量或列向量），一维结构可以不用进行拷贝。
-        # 注意：我们现在要进行矩阵的运算，因此需要是二维的结构，我们通过reshape方法进行转换。
+        # 注意：我们现在要进行矩阵的运算，因此需要是二维的结构，我们通过reshape方法进行转换，-1表示根据行数自动处理。
         y = np.asmatrix(y).reshape(-1, 1)
-        # 通过最小二乘公式，求解出最佳的权重值。
+        # 通过最小二乘公式，求解出最佳的权重值，w标识weight，T表示转置，注意是矩阵的乘法。
         self.w_ = (X.T * X).I * X.T * y
          
     def predict(self, X):
@@ -95,43 +95,44 @@ print(np.mean((result - test_y) ** 2))
 # 查看模型的权重值
 print(lr.w_)
  
-# # ⑤在考虑截距的情况下，重新构建训练集与测试集。
-# # 考虑截距，增加一列，该列的所有值都是1。
-# t = data.sample(len(data), random_state=0)
-# # 可以这样增加一列。
-# # t["Intercept"] = 1
-# # 按照习惯，截距作为w0，我们为之而配上一个x0，x0列放在最前面。
-# new_columns = t.columns.insert(0, "Intercept")
-# # 重新安排列的顺序，如果值为空，则使用fill_value参数指定的值进行填充。
-# t = t.reindex(columns=new_columns, fill_value=1)
-# # t["Intercept"] = 1
-# # t
-# train_X = t.iloc[:400, :-1]
-# train_y = t.iloc[:400, -1]
-# test_X = t.iloc[400:, :-1]
-# test_y = t.iloc[400:, -1]
-# 
-# lr = LinearRegression()
-# lr.fit(train_X, train_y)
-# result = lr.predict(test_X)
-# # result
-# print(np.mean((result - test_y) ** 2))
-# print(lr.w_)
-# 
-# # ⑥导入可视化库，进行数据可视化。
-# import matplotlib as mpl
-# import matplotlib.pyplot as plt
-# mpl.rcParams["font.family"] = "SimHei"
-# mpl.rcParams["axes.unicode_minus"] = False
-# 
-# # ⑦绘制预测值与真实值，对比二值之间的差距。
-# plt.figure(figsize=(10, 10))
-# # 绘制预测值
-# plt.plot(result, "ro-", label="预测值")
-# # 绘制真实值
-# plt.plot(test_y.values, "go--", label="真实值")
-# plt.title("线性回归预测-最小二乘法")
-# plt.xlabel("样本序号")
-# plt.ylabel("房价")
-# plt.legend()
-# plt.show()
+# ⑤在考虑截距的情况下，重新构建训练集与测试集。
+# 考虑截距，增加一列，该列的所有值都是1，使得W0乘以X0的值为原W0。
+t = data.sample(len(data), random_state=0)
+# 可以这样增加一列。
+# t["Intercept"] = 1
+# 按照习惯，截距作为w0，我们为之而配上一个x0，x0列放在最前面。
+new_columns = t.columns.insert(0, "Intercept")
+# 重新安排列的顺序，如果值为空，则使用fill_value参数指定的值进行填充。
+t = t.reindex(columns=new_columns, fill_value=1)
+# t["Intercept"] = 1
+print(t)
+train_X = t.iloc[:400, :-1]
+train_y = t.iloc[:400, -1]
+test_X = t.iloc[400:, :-1]
+test_y = t.iloc[400:, -1]
+ 
+lr = LinearRegression()
+lr.fit(train_X, train_y)
+result = lr.predict(test_X)
+# result
+print(np.mean((result - test_y) ** 2))
+print(lr.w_)
+ 
+# ⑥导入可视化库，进行数据可视化。
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+mpl.rcParams["font.family"] = "SimHei"
+mpl.rcParams["axes.unicode_minus"] = False
+ 
+# ⑦绘制预测值与真实值，对比二值之间的差距。
+plt.figure(figsize=(10, 10))
+# 绘制预测值
+plt.plot(result, "ro-", label="预测值")
+# 绘制真实值
+plt.plot(test_y.values, "go--", label="真实值")
+plt.title("线性回归预测-最小二乘法")
+plt.xlabel("样本序号")
+plt.ylabel("房价")
+# 用于生成图例
+plt.legend()
+plt.show()
