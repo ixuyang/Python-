@@ -69,35 +69,35 @@ class KMeans:
                 # 计算每个簇内所有点的均值，更新聚类中心。
                 self.cluster_centers_[i] = np.mean(X[self.labels_ == i], axis=0)
                  
-#     def predict(self, X):
-#         """根据参数传递的样本，对样本数据进行预测。（预测样本属于哪一个簇中）
-#         
-#         Parameters
-#         -----
-#         X : 类数组类型。 形状为: [样本数量， 特征数量]
-#             待预测的特征属性。
-#         
-#         Returns
-#         -----
-#         result : 数组类型
-#             预测的结果。每一个X所属的簇。
-#         """
-#         
-#         X = np.asarray(X)
-#         result = np.zeros(len(X))
-#         for index, x in enumerate(X):
-#             # 计算样本到每个聚类中心的距离。
-#             dis = np.sqrt(np.sum((x - self.cluster_centers_) ** 2, axis=1))
-#             # 找到距离最近的聚类中心，划分类别。
-#             result[index] = dis.argmin()
-#         return result
+    def predict(self, X):
+        """根据参数传递的样本，对样本数据进行预测。（预测样本属于哪一个簇中）
+         
+        Parameters
+        -----
+        X : 类数组类型。 形状为: [样本数量， 特征数量]
+            待预测的特征属性。
+         
+        Returns
+        -----
+        result : 数组类型
+            预测的结果。每一个X所属的簇。
+        """
+         
+        X = np.asarray(X)
+        result = np.zeros(len(X))
+        for index, x in enumerate(X):
+            # 计算样本到每个聚类中心的距离。
+            dis = np.sqrt(np.sum((x - self.cluster_centers_) ** 2, axis=1))
+            # 找到距离最近的聚类中心，划分类别。
+            result[index] = dis.argmin()
+        return result
 # ④对KMeans类进行训练。
-# 
-# kmeans = KMeans(3, 50)
-# kmeans.fit(t)
+ 
+kmeans = KMeans(3, 50)
+kmeans.fit(t)
 # ⑤训练之后，查看聚类中心。
 # 
-# kmeans.cluster_centers_
+print(kmeans.cluster_centers_)
 # 程序运行结果如下：
 # 
 # array([[46.33977936,  8.93380516, 23.19047005, 13.11741633,  4.8107557 ,
@@ -106,35 +106,37 @@ class KMeans:
 #          0.91000428,  1.92515077,  0.82113238],
 #        [ 7.93541008,  4.56182052, 30.65583437, 18.57726789,  8.61597195,
 #          1.28482514, 26.81950293,  1.30158264]])
+# 查看某个簇下的所有样本数据
+print(t[kmeans.labels_ == 0])
 # ⑥选择几个测试数据，对结果进行预测。
 # 
-# kmeans.predict([[30, 30, 40, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 30, 30, 40], [30, 30, 0, 0, 0, 0, 20, 20]])
+print(kmeans.predict([[30, 30, 40, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 30, 30, 40], [30, 30, 0, 0, 0, 0, 20, 20]]))
 # 程序运行结果如下：
 # 
 # array([0., 2., 1.])
 # ⑦为了方便的进行数据可视化，我们取数据集中的两列，训练数据。
 # 
-# t2 = data.loc[:, "Food%":"Fresh%"]
-# kmeans = KMeans(3, 50)
-# kmeans.fit(t2)
+t2 = data.loc[:, "Food%":"Fresh%"]
+kmeans = KMeans(3, 50)
+kmeans.fit(t2)
 # ⑧导入可视化所必须的库。
-# 
-# import matplotlib as mpl
-# import matplotlib.pyplot as plt
-# mpl.rcParams["font.family"] = "SimHei"
-# mpl.rcParams["axes.unicode_minus"] = False
+ 
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+mpl.rcParams["font.family"] = "SimHei"
+mpl.rcParams["axes.unicode_minus"] = False
 # ⑨进行数据可视化显示。
 # 
-# plt.figure(figsize=(10, 10))
-# # 绘制每个类别的散点图
-# plt.scatter(t2[kmeans.labels_ == 0].iloc[:, 0], t2[kmeans.labels_ == 0].iloc[:, 1], label="类别1")
-# plt.scatter(t2[kmeans.labels_ == 1].iloc[:, 0], t2[kmeans.labels_ == 1].iloc[:, 1], label="类别2")
-# plt.scatter(t2[kmeans.labels_ == 2].iloc[:, 0], t2[kmeans.labels_ == 2].iloc[:, 1], label="类别3")
-# # 绘制聚类中心
-# plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], marker="+", s=300)
-# plt.title("食物与肉类购买的聚类分析")
-# plt.xlabel("食物")
-# plt.ylabel("肉类")
-# plt.legend()
-# plt.show()
+plt.figure(figsize=(10, 10))
+# 绘制每个类别的散点图
+plt.scatter(t2[kmeans.labels_ == 0].iloc[:, 0], t2[kmeans.labels_ == 0].iloc[:, 1], label="类别1")
+plt.scatter(t2[kmeans.labels_ == 1].iloc[:, 0], t2[kmeans.labels_ == 1].iloc[:, 1], label="类别2")
+plt.scatter(t2[kmeans.labels_ == 2].iloc[:, 0], t2[kmeans.labels_ == 2].iloc[:, 1], label="类别3")
+# 绘制聚类中心
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], marker="+", s=300)
+plt.title("食物与肉类购买的聚类分析")
+plt.xlabel("食物")
+plt.ylabel("肉类")
+plt.legend()
+plt.show()
 # ⑩程序运行结果如下：
